@@ -5,7 +5,12 @@ Answer each question in 3 to 5 sentences. Be specific and honest about what actu
 ## 1. What was broken when you started?
 
 - What did the game look like the first time you ran it?
+
 - List at least two concrete bugs you noticed at the start  
+You are not able to restart the game. At least the UI doesn't show the game restarting the developer pannel does show a new secret but the rest seem to not reset. 
+The Hints seem to be opposite of what they should be. 
+number of available attempts is off by 1. 
+
   (for example: "the hints were backwards").
 
 **Bug Reproduction Log**
@@ -14,8 +19,8 @@ Document at least 3 bugs you found. Add rows as needed.
 
 | Input | Expected Behavior | Actual Behavior | Console Output / Error |
 |-------|-------------------|-----------------|------------------------|
-| | | | |
-| | | | |
+50       go Lower             Go higher         secret 31/telling to go higher when it should have said to go lower.   
+10                                              Secret is out of range despite being on easy mode secret is set to 50.
 | | | | |
 
 ---
