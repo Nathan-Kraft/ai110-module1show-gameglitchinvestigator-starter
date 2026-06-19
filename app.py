@@ -1,12 +1,13 @@
 import random
 import streamlit as st
+from logic_utils import check_guess
 
 def get_range_for_difficulty(difficulty: str):
     if difficulty == "Easy":
         return 1, 20
     if difficulty == "Normal":
         return 1, 100
-    if difficulty == "Hard":
+    if difficulty == "Hard":# FIXME: Logic breaks here
         return 1, 50
     return 1, 100
 
@@ -29,23 +30,6 @@ def parse_guess(raw: str):
     return True, value, None
 
 
-def check_guess(guess, secret):
-    if guess == secret:
-        return "Win", "🎉 Correct!"
-
-    try:
-        if guess > secret:
-            return "Too High", "📈 Go HIGHER!"
-        else:
-            return "Too Low", "📉 Go LOWER!"
-    except TypeError:
-        g = str(guess)
-        if g == secret:
-            return "Win", "🎉 Correct!"
-        if g > secret:
-            return "Too High", "📈 Go HIGHER!"
-        return "Too Low", "📉 Go LOWER!"
-
 
 def update_score(current_score: int, outcome: str, attempt_number: int):
     if outcome == "Win":
@@ -54,7 +38,7 @@ def update_score(current_score: int, outcome: str, attempt_number: int):
             points = 10
         return current_score + points
 
-    if outcome == "Too High":
+    if outcome == "Too High": # FIXME: Logic breaks here
         if attempt_number % 2 == 0:
             return current_score + 5
         return current_score - 5
@@ -92,7 +76,7 @@ st.sidebar.caption(f"Attempts allowed: {attempt_limit}")
 if "secret" not in st.session_state:
     st.session_state.secret = random.randint(low, high)
 
-if "attempts" not in st.session_state:
+if "attempts" not in st.session_state:# FIXME: Logic breaks here
     st.session_state.attempts = 1
 
 if "score" not in st.session_state:
@@ -131,7 +115,7 @@ with col2:
 with col3:
     show_hint = st.checkbox("Show hint", value=True)
 
-if new_game:
+if new_game: # FIXME: Logic breaks here
     st.session_state.attempts = 0
     st.session_state.secret = random.randint(1, 100)
     st.success("New game started.")
@@ -155,7 +139,7 @@ if submit:
     else:
         st.session_state.history.append(guess_int)
 
-        if st.session_state.attempts % 2 == 0:
+        if st.session_state.attempts % 2 == 0:# FIXME: Logic breaks here
             secret = str(st.session_state.secret)
         else:
             secret = st.session_state.secret

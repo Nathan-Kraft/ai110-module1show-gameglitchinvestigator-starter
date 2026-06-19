@@ -20,15 +20,17 @@ Document at least 3 bugs you found. Add rows as needed.
 | Input | Expected Behavior | Actual Behavior | Console Output / Error |
 |-------|-------------------|-----------------|------------------------|
 50       go Lower             Go higher         secret 31/telling to go higher when it should have said to go lower.   
-10                                              Secret is out of range despite being on easy mode secret is set to 50.
-| | | | |
+10                                              Secret is out of range despite being on easy mode secret is set to 50 when range is supposed to be 1-20.
+30                                              Secret is out of range despite being on Hard mode secret is set to 56 when range is supposed to be 1-50. Also the hard mode should have a bigger range than normal mode. 
 
 ---
 
 ## 2. How did you use AI as a teammate?
 
 - Which AI tools did you use on this project (for example: ChatGPT, Gemini, Copilot)?
+Claude
 - Give one example of an AI suggestion that was correct (including what the AI suggested and how you verified the result).
+
 - Give one example of an AI suggestion that was incorrect or misleading (including what the AI suggested and how you verified the result).
 
 ---
