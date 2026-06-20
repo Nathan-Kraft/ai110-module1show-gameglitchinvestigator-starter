@@ -1,16 +1,12 @@
 import random
 import streamlit as st
-from logic_utils import check_guess
+from logic_utils import check_guess, get_range_for_difficulty, update_score
 
-def get_range_for_difficulty(difficulty: str):
-    if difficulty == "Easy":
-        return 1, 20
-    if difficulty == "Normal":
-        return 1, 100
-    if difficulty == "Hard":# FIXME: Logic breaks here
-        return 1, 50
-    return 1, 100
-
+"""
+app.py:3 — import updated to from logic_utils import check_guess, get_range_for_difficulty, update_score;
+the local functions definition are removed.
+All functions are now moved to logic_utils.py.
+"""
 
 def parse_guess(raw: str):
     if raw is None:
@@ -29,24 +25,7 @@ def parse_guess(raw: str):
 
     return True, value, None
 
-
-
-def update_score(current_score: int, outcome: str, attempt_number: int):
-    if outcome == "Win":
-        points = 100 - 10 * (attempt_number + 1)
-        if points < 10:
-            points = 10
-        return current_score + points
-
-    if outcome == "Too High": # FIXME: Logic breaks here
-        if attempt_number % 2 == 0:
-            return current_score + 5
-        return current_score - 5
-
-    if outcome == "Too Low":
-        return current_score - 5
-
-    return current_score
+# update_score moved to logic_utils.py
 
 st.set_page_config(page_title="Glitchy Guesser", page_icon="🎮")
 
@@ -115,9 +94,11 @@ with col2:
 with col3:
     show_hint = st.checkbox("Show hint", value=True)
 
-if new_game: # FIXME: Logic breaks here
+if new_game:
     st.session_state.attempts = 0
-    st.session_state.secret = random.randint(1, 100)
+    st.session_state.secret = random.randint(low, high)
+    st.session_state.status = "playing"
+    st.session_state.history = []
     st.success("New game started.")
     st.rerun()
 
