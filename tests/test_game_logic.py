@@ -1,4 +1,5 @@
-from logic_utils import check_guess, update_score, get_range_for_difficulty
+import pytest
+from logic_utils import check_guess, update_score, get_range_for_difficulty, parse_guess
 
 def test_winning_guess():
     # Fixed: check_guess returns a tuple (outcome, message); unpack instead of comparing the whole tuple to a string
@@ -154,3 +155,118 @@ def test_hard_high_not_same_as_hardcoded_bug():
     # Bug used randint(1, 100) for all difficulties; Hard should go to 500, not 100
     _, hard_high = get_range_for_difficulty("Hard")
     assert hard_high != 100
+
+"""
+Tests that specifically target the three bugs fixed in this session:
+
+  Bug 1 — parse_guess raised NotImplementedError (stub was never filled in).
+  Bug 2 — st.session_state.attempts was initialised to 1 instead of 0,
+           causing the first turn to report one fewer remaining attempt than
+           the player actually had.  (Streamlit session state cannot be unit-
+           tested without a full app harness, so this bug is documented here
+           but not exercised via pytest.)
+  Bug 3 — On every even-numbered attempt, app.py cast the int secret to str
+           before passing it to check_guess.  For multi-digit secrets this
+           produces wrong comparisons: "9" > "10" is True lexicographically,
+           so check_guess(9, "10") would return "Too High" instead of "Too Low".
+"""
+
+
+# ---------------------------------------------------------------------------
+# Bug 1 — parse_guess was a NotImplementedError stub
+# ---------------------------------------------------------------------------
+
+def test_parse_guess_does_not_raise():
+    # Before the fix, calling parse_guess raised NotImplementedError immediately.
+    # Any call at all would crash; a valid input is sufficient to confirm the
+    # stub has been replaced with a real implementation.
+    ok, value, err = parse_guess("42")
+    assert ok is True
+    assert value == 42
+    assert err is None
+
+
+def test_parse_guess_none_returns_error():
+    ok, value, err = parse_guess(None)
+    assert ok is False
+    assert value is None
+    assert err is not None
+
+
+def test_parse_guess_empty_string_returns_error():
+    ok, value, err = parse_guess("")
+    assert ok is False
+    assert value is None
+    assert err is not None
+
+
+def test_parse_guess_non_numeric_returns_error():
+    ok, value, err = parse_guess("abc")
+    assert ok is False
+    assert value is None
+    assert err is not None
+
+
+def test_parse_guess_decimal_string_truncates_to_int():
+    # "3.7" should parse to 3, not raise an error.
+    ok, value, err = parse_guess("3.7")
+    assert ok is True
+    assert value == 3
+    assert err is None
+
+
+def test_parse_guess_none_and_empty_produce_same_outcome():
+    # The original app.py had two separate if-blocks for None and ""; the merged
+    # version must behave identically for both.
+    none_result = parse_guess(None)
+    empty_result = parse_guess("")
+    assert none_result == empty_result
+
+
+# ---------------------------------------------------------------------------
+# Bug 3 — secret cast to str on even attempts breaks check_guess comparisons
+# ---------------------------------------------------------------------------
+
+def test_int_secret_too_low_two_digit():
+    # Canonical case: guess=9, secret=10 as integers.
+    # 9 < 10, so the outcome must be "Too Low".
+    outcome, _ = check_guess(9, 10)
+    assert outcome == "Too Low"
+
+
+def test_string_secret_lexicographic_trap():
+    # This is the exact failure the even-attempt bug introduced.
+    # Lexicographically "9" > "10" (because "9" > "1"), so a naive string
+    # comparison returns "Too High".  check_guess must return "Too Low" here
+    # regardless of whether the secret arrives as int or str.
+    outcome, _ = check_guess(9, "10")
+    assert outcome == "Too Low", (
+        'check_guess(9, "10") returned "Too High" — '
+        "string comparison \"9\" > \"10\" is True, which is the even-attempt cast bug"
+    )
+
+
+def test_string_secret_hint_direction_correct():
+    # The hint message must also point the right way through the TypeError branch.
+    _, message = check_guess(9, "10")
+    assert "HIGHER" in message
+    assert "LOWER" not in message
+
+
+def test_int_and_string_secret_produce_same_outcome():
+    # After the fix, passing the secret as int vs str should produce the same
+    # outcome for a range of values where lexicographic order differs from
+    # numeric order (all pairs where guess has more digits than secret, or vice
+    # versa, are the interesting edge cases).
+    pairs = [
+        (9, 10),    # "9" > "10" lexicographically — classic trap
+        (99, 100),  # "99" > "100" lexicographically
+        (19, 20),   # "19" > "20" is False, but exercises the branch
+    ]
+    for guess, secret in pairs:
+        int_outcome, _ = check_guess(guess, secret)
+        str_outcome, _ = check_guess(guess, str(secret))
+        assert int_outcome == str_outcome, (
+            f"check_guess({guess}, {secret}) → {int_outcome!r} but "
+            f"check_guess({guess}, '{secret}') → {str_outcome!r}"
+        )

@@ -1,31 +1,14 @@
 import random
 import streamlit as st
-from logic_utils import check_guess, get_range_for_difficulty, update_score
+from logic_utils import check_guess, get_range_for_difficulty, parse_guess, update_score
 
 """
-app.py:3 — import updated to from logic_utils import check_guess, get_range_for_difficulty, update_score;
+app.py:3 — import updated to from logic_utils import check_guess, get_range_for_difficulty, parse_guess, update_score;
 the local functions definition are removed.
 All functions are now moved to logic_utils.py.
 """
 
-def parse_guess(raw: str):
-    if raw is None:
-        return False, None, "Enter a guess."
-
-    if raw == "":
-        return False, None, "Enter a guess."
-
-    try:
-        if "." in raw:
-            value = int(float(raw))
-        else:
-            value = int(raw)
-    except Exception:
-        return False, None, "That is not a number."
-
-    return True, value, None
-
-# update_score moved to logic_utils.py
+# parse_guess moved to logic_utils.py
 
 st.set_page_config(page_title="Glitchy Guesser", page_icon="🎮")
 
@@ -55,8 +38,8 @@ st.sidebar.caption(f"Attempts allowed: {attempt_limit}")
 if "secret" not in st.session_state:
     st.session_state.secret = random.randint(low, high)
 
-if "attempts" not in st.session_state:# FIXME: Logic breaks here
-    st.session_state.attempts = 1
+if "attempts" not in st.session_state:
+    st.session_state.attempts = 0  # Fixed: was 1, causing first attempt to be miscounted (new game resets to 0)
 
 if "score" not in st.session_state:
     st.session_state.score = 0
@@ -120,11 +103,8 @@ if submit:
     else:
         st.session_state.history.append(guess_int)
 
-        if st.session_state.attempts % 2 == 0:# FIXME: Logic breaks here
-            secret = str(st.session_state.secret)
-        else:
-            secret = st.session_state.secret
-
+        # Fixed: secret was cast to str on even attempts, breaking check_guess comparisons
+        secret = st.session_state.secret
         outcome, message = check_guess(guess_int, secret)
 
         if show_hint:

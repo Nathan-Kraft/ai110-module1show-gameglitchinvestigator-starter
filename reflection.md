@@ -20,6 +20,7 @@ Document at least 3 bugs you found. Add rows as needed.
 | Input | Expected Behavior | Actual Behavior | Console Output / Error |
 |-------|-------------------|-----------------|------------------------|
 50       go Lower             Go higher         secret 31/telling to go higher when it should have said to go lower.   
+
 10                                              Secret is out of range despite being on easy mode secret is set to 50 when range is supposed to be 1-20.
 30                                              Secret is out of range despite being on Hard mode secret is set to 56 when range is supposed to be 1-50. Also the hard mode should have a bigger range than normal mode. 
 
@@ -29,9 +30,12 @@ Document at least 3 bugs you found. Add rows as needed.
 
 - Which AI tools did you use on this project (for example: ChatGPT, Gemini, Copilot)?
 Claude
+
 - Give one example of an AI suggestion that was correct (including what the AI suggested and how you verified the result).
 
+
 - Give one example of an AI suggestion that was incorrect or misleading (including what the AI suggested and how you verified the result).
+The AI gave me pytests that were set up correctly for the check_guess function, providing that the check_guess function was implemented correctly in the first place. However the AI originally left the function to compare strings, which would only compare the first digit of the string, which would then cause the error of the hints. I didn't catch this at first so when I tried to run my pytests I found that it would always fail. I then asked the AI why it was failing and then it investigated and found the error within the check_guess funtion and fixed it in the logic_utils.py file. 
 
 ---
 
@@ -56,3 +60,6 @@ Claude
   - This could be a testing habit, a prompting strategy, or a way you used Git.
 - What is one thing you would do differently next time you work with AI on a coding task?
 - In one or two sentences, describe how this project changed the way you think about AI generated code.
+
+
+pet, plan, owner, constraint, 

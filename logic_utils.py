@@ -18,7 +18,18 @@ def parse_guess(raw: str):
 
     Returns: (ok: bool, guess_int: int | None, error_message: str | None)
     """
-    raise NotImplementedError("Refactor this function from app.py into logic_utils.py")
+    if raw is None or raw == "":
+        return False, None, "Enter a guess."
+
+    try:
+        if "." in raw:
+            value = int(float(raw))
+        else:
+            value = int(raw)
+    except Exception:
+        return False, None, "That is not a number."
+
+    return True, value, None
 
 
 """
@@ -34,16 +45,21 @@ def check_guess(guess, secret):
     if guess == secret:
         return "Win", "🎉 Correct!"
 
+    # Happy path: both values are ints, so > is a numeric comparison.
     try:
         if guess > secret:
             return "Too High", "📉 Go LOWER!"
         else:
             return "Too Low", "📈 Go HIGHER!"
     except TypeError:
-        g = str(guess)
-        if g == secret:
+        # Fallback: secret arrived as a str (e.g. from the even-attempt cast bug
+        # in app.py that has since been fixed).  The original code converted guess
+        # to str and compared strings, which gave wrong results for multi-digit
+        # numbers — "9" > "10" is True lexicographically, flipping the hint.
+        # Fix: convert both sides to int so the comparison is always numeric.
+        if int(guess) == int(secret):
             return "Win", "🎉 Correct!"
-        elif g > secret:
+        elif int(guess) > int(secret):
             return "Too High", "📉 Go LOWER!"
         return "Too Low", "📈 Go HIGHER!"
 
