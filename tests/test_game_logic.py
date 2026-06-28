@@ -256,8 +256,8 @@ def test_string_secret_hint_direction_correct():
 def test_int_and_string_secret_produce_same_outcome():
     # After the fix, passing the secret as int vs str should produce the same
     # outcome for a range of values where lexicographic order differs from
-    # numeric order (all pairs where guess has more digits than secret, or vice
-    # versa, are the interesting edge cases).
+    # numeric order (all pairs where guess has more digits than secret, or vice versa,
+    # are the interesting edge cases).
     pairs = [
         (9, 10),    # "9" > "10" lexicographically — classic trap
         (99, 100),  # "99" > "100" lexicographically
@@ -270,3 +270,4 @@ def test_int_and_string_secret_produce_same_outcome():
             f"check_guess({guess}, {secret}) → {int_outcome!r} but "
             f"check_guess({guess}, '{secret}') → {str_outcome!r}"
         )
+        

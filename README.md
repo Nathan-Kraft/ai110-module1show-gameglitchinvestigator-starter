@@ -25,9 +25,17 @@ It wrote the code, ran away, and now the game is unplayable.
 
 ## 📝 Document Your Experience
 
-- [ ] Describe the game's purpose.
+- [x] Describe the game's purpose.
+
+  **Game Glitch Investigator: The Impossible Guesser** is an educational debugging exercise disguised as a broken number-guessing game. The player's goal is to guess a randomly chosen secret number, but the game has been intentionally shipped with bugs — the secret number resets on every guess, and the "Higher/Lower" hints are inverted — making it impossible to win in its broken state.
+
+  The real purpose of the game is to teach players how to diagnose and fix common bugs in a Python/Streamlit application: specifically, understanding Streamlit's session state model (why variables reset on re-render) and identifying inverted conditional logic. After finding and fixing all the bugs, players refactor the core logic into a separate module and validate their fixes with a pytest test suite.
+
 - [ ] Detail which bugs you found.
+
+
 - [ ] Explain what fixes you applied.
+
 
 ## 📸 Demo Walkthrough
 
