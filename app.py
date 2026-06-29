@@ -1,14 +1,8 @@
 import random
 import streamlit as st
+# Fix: all game logic functions were defined inline in app.py alongside UI code.
+# Refactored check_guess, get_range_for_difficulty, parse_guess, and update_score into logic_utils.py. using agent mode
 from logic_utils import check_guess, get_range_for_difficulty, parse_guess, update_score
-
-"""
-app.py:3 — import updated to from logic_utils import check_guess, get_range_for_difficulty, parse_guess, update_score;
-the local functions definition are removed.
-All functions are now moved to logic_utils.py.
-"""
-
-# parse_guess moved to logic_utils.py
 
 st.set_page_config(page_title="Glitchy Guesser", page_icon="🎮")
 
@@ -39,7 +33,7 @@ if "secret" not in st.session_state:
     st.session_state.secret = random.randint(low, high)
 
 if "attempts" not in st.session_state:
-    st.session_state.attempts = 0  # Fixed: was 1, causing first attempt to be miscounted (new game resets to 0)
+    st.session_state.attempts = 0  # Fix: was 1, so the counter started one ahead and the first attempt was miscounted using agent mode. 
 
 if "score" not in st.session_state:
     st.session_state.score = 0
@@ -82,6 +76,7 @@ if new_game:
     st.session_state.secret = random.randint(low, high)
     st.session_state.status = "playing"
     st.session_state.history = []
+    st.session_state.score = 0  # Fix: score was not reset on new game, causing it to accumulate across sessions
     st.success("New game started.")
     st.rerun()
 
@@ -103,7 +98,7 @@ if submit:
     else:
         st.session_state.history.append(guess_int)
 
-        # Fixed: secret was cast to str on even attempts, breaking check_guess comparisons
+        # Fix: was `str(secret)` on even attempts, causing lexicographic comparisons that flipped hints for multi-digit numbers using agent mode.
         secret = st.session_state.secret
         outcome, message = check_guess(guess_int, secret)
 
